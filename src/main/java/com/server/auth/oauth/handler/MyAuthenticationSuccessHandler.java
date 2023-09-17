@@ -1,7 +1,7 @@
 package com.server.auth.oauth.handler;
 
-import com.server.auth.oauth.refresh.domain.GeneratedToken;
-import com.server.auth.oauth.util.JwtUtil;
+import com.server.auth.token.refresh.domain.GeneratedToken;
+import com.server.auth.token.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -30,8 +30,7 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         // 사용자 이메일을 가져온다.
         String email = oAuth2User.getAttribute("email");
-        // 서비스 제공 플랫폼(GOOGLE, KAKAO, NAVER)이 어디인지 가져온다.
-        String provider = oAuth2User.getAttribute("provider");
+        log.info("email : {}", email);
 
         // CustomOAuth2UserService에서 셋팅한 로그인한 회원 존재 여부를 가져온다.
         boolean isExist = oAuth2User.getAttribute("exist");
@@ -48,7 +47,7 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
             log.info("jwtToken = {}", token.getAccessToken());
 
             // accessToken을 쿼리스트링에 담는 url을 만들어준다.
-            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost/loginSuccess")
+            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost/welcome")
                     .queryParam("accessToken", token.getAccessToken())
                     .build()
                     .encode(StandardCharsets.UTF_8)
@@ -73,7 +72,8 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
             log.info("jwtToken = {}", token.getAccessToken());
 
             // accessToken을 쿼리스트링에 담는 url을 만들어준다.
-            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost/loginSuccess")
+//            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8080")
+            String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/api/user/welcome")
                     .queryParam("accessToken", token.getAccessToken())
                     .build()
                     .encode(StandardCharsets.UTF_8)

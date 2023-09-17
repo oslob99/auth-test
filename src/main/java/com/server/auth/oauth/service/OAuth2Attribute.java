@@ -16,8 +16,7 @@ public class OAuth2Attribute {
     private String attributeKey; // 사용자 속성의 키 값
     private String email; // 이메일 정보
     private String name; // 이름 정보
-    private String picture; // 프로필 사진 정보
-    private String provider; // 제공자 정보
+    private String profile; // 프로필 사진 정보
 
     // 서비스에 따라 OAuth2Attribute 객체를 생성하는 메서드
     static OAuth2Attribute of(String provider, String attributeKey,
@@ -36,7 +35,6 @@ public class OAuth2Attribute {
                                             Map<String, Object> attributes) {
         return OAuth2Attribute.builder()
                 .email((String) attributes.get("email"))
-                .provider(provider)
                 .attributes(attributes)
                 .attributeKey(attributeKey)
                 .build();
@@ -48,7 +46,6 @@ public class OAuth2Attribute {
         map.put("id", attributeKey);
         map.put("key", attributeKey);
         map.put("email", email);
-        map.put("provider", provider);
 
         return map;
     }

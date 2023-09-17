@@ -1,7 +1,8 @@
 package com.server.auth.oauth.service;
 
-import com.server.auth.oauth.user.domain.User;
-import com.server.auth.oauth.user.service.UserService;
+import com.server.auth.user.domain.User;
+import com.server.auth.user.dto.request.UserSignUpDto;
+import com.server.auth.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,28 +43,37 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 OAuth2Attribute.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         // OAuth2Attribute의 속성값들을 Map으로 반환 받는다.
-        Map<String, Object> memberAttribute = oAuth2Attribute.convertToMap();
+        Map<String, Object> userAttribute = oAuth2Attribute.convertToMap();
 
         // 사용자 email(또는 id) 정보를 가져온다.
-        String email = (String) memberAttribute.get("email");
+        String email = (String) userAttribute.get("email");
+        String name = (String) userAttribute.get("name");
+        String profile = (String) userAttribute.get("profile");
+        log.info("email : {}, name : {} , profile : {} ", email, name, profile);
+
         // 이메일로 가입된 회원인지 조회한다.
         Optional<User> findMember = userService.findByEmail(email);
 
         if (findMember.isEmpty()) {
             // 회원이 존재하지 않을경우, memberAttribute의 exist 값을 false로 넣어준다.
-            memberAttribute.put("exist", false);
+            userService.save(UserSignUpDto.builder()
+                    .email(email)
+                    .name(name)
+                    .profile(profile)
+                    .build());
+            userAttribute.put("exist", false);
             // 회원의 권한(회원이 존재하지 않으므로 기본권한인 ROLE_USER를 넣어준다), 회원속성, 속성이름을 이용해 DefaultOAuth2User 객체를 생성해 반환한다.
             return new DefaultOAuth2User(
                     Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                    memberAttribute, "email");
+                    userAttribute, "email");
         }
 
         // 회원이 존재할경우, memberAttribute의 exist 값을 true로 넣어준다.
-        memberAttribute.put("exist", true);
+        userAttribute.put("exist", true);
         // 회원의 권한과, 회원속성, 속성이름을 이용해 DefaultOAuth2User 객체를 생성해 반환한다.
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_".concat(String.valueOf(findMember.get().getRole())))),
-                memberAttribute, "email");
+                userAttribute, "email");
 
     }
 }
