@@ -18,20 +18,17 @@ public class OAuth2Attribute {
     private String name; // 이름 정보
     private String profile; // 프로필 사진 정보
 
-    // 서비스에 따라 OAuth2Attribute 객체를 생성하는 메서드
-    static OAuth2Attribute of(String provider, String attributeKey,
+    static OAuth2Attribute of(String attributeKey,
                               Map<String, Object> attributes) {
-        if (provider.equals("google")) {
-            return ofGoogle(provider, attributeKey, attributes);
-        }
-        throw new RuntimeException();
+
+            return ofGoogle(attributeKey, attributes);
     }
 
     /*
      *   Google 로그인일 경우 사용하는 메서드, 사용자 정보가 따로 Wrapping 되지 않고 제공되어,
      *   바로 get() 메서드로 접근이 가능하다.
      * */
-    private static OAuth2Attribute ofGoogle(String provider, String attributeKey,
+    private static OAuth2Attribute ofGoogle(String attributeKey,
                                             Map<String, Object> attributes) {
         return OAuth2Attribute.builder()
                 .email((String) attributes.get("email"))

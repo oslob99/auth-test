@@ -1,4 +1,4 @@
-package com.server.auth.oauth.security.dto;
+package com.server.auth.oauth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @Builder
-public class SecurityUserDto {
+public class UserInfoDto {
 
     private Long userId;
     private String name;

@@ -1,12 +1,14 @@
-package com.server.auth.token.util;
+package com.server.auth.common.util;
 
-import com.server.auth.token.refresh.domain.GeneratedToken;
-import com.server.auth.token.refresh.service.RefreshTokenService;
-import com.server.auth.token.util.properties.JwtProperties;
+import com.server.auth.oauth.dto.UserInfoDto;
+import com.server.auth.oauth.refresh.domain.Token;
+import com.server.auth.oauth.refresh.service.RefreshTokenService;
+import com.server.auth.common.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,14 +31,14 @@ public class JwtUtil {
     }
 
 
-    public GeneratedToken generateToken(String email, String role) {
+    public Token generateToken(String email, String role) {
         // refreshToken과 accessToken을 생성한다.
         String refreshToken = generateRefreshToken(email, role);
         String accessToken = generateAccessToken(email, role);
 
         // 토큰을 Redis에 저장한다.
         tokenService.saveTokenInfo(email, refreshToken, accessToken);
-        return new GeneratedToken(accessToken, refreshToken);
+        return new Token(accessToken, refreshToken);
     }
 
     public String generateRefreshToken(String email, String role) {
@@ -65,7 +67,7 @@ public class JwtUtil {
 
     public String generateAccessToken(String email, String role) {
 //        long tokenPeriod = 1000L * 60L * 30L; // 30분
-        long tokenPeriod = 1000L * 10L; // 10초
+        long tokenPeriod = 1000L * 60L; // 10초
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role", role);
 
@@ -83,6 +85,34 @@ public class JwtUtil {
                         .compact();
 
     }
+
+    /**
+     * 클라이언트가 보낸 토큰을 디코딩 / 파싱해서 토큰의 위조 여부 확인
+     * 토큰을 JSON 으로 파싱해서 클레임을 리턴
+     * @param token - 클라이언트가 전송한 인코딩 된 토큰
+     * @return - 토큰에서 subject(userIdx, 유저 식별자) 를 꺼내서 반환
+     */
+    public UserInfoDto validateAndGetTokenUserInfo(String token) {
+
+        log.info("validateAndGetTokenUserInfo / token: {}", token);
+
+        Claims claims = Jwts.parserBuilder()
+                // 토큰 발급자의 발급 당시 서명을 넣어줌
+                .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()))
+                // 서명 위조 검사 - 클라이언트 토큰의 서명과 서버 발급 당시 서명을 비교
+                // 위조 X 경우 : payload(Claims) 를 리턴
+                // 위조 O 경우 : 예외 발생
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return UserInfoDto.builder()
+                .userId(Long.valueOf(claims.getSubject()))
+                .email(claims.get("email", String.class))
+                .role((String) claims.get("role"))
+                .build();
+    }
+
 
 
     public boolean verifyToken(String token) {

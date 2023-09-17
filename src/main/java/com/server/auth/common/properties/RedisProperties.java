@@ -1,4 +1,4 @@
-package com.server.auth.token.util.properties;
+package com.server.auth.common.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

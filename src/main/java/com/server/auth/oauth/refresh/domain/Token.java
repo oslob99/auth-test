@@ -1,4 +1,4 @@
-package com.server.auth.token.refresh.domain;
+package com.server.auth.oauth.refresh.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class GeneratedToken {
+public class Token {
 
     private String accessToken;
     private String refreshToken;

@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class MyAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException, IOException {
         // 인증 실패시 메인 페이지로 이동

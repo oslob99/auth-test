@@ -1,14 +1,13 @@
 package com.server.auth.config;
 
-import com.server.auth.oauth.handler.MyAuthenticationFailureHandler;
-import com.server.auth.oauth.handler.MyAuthenticationSuccessHandler;
-import com.server.auth.oauth.service.CustomOAuth2UserService;
-import com.server.auth.token.util.filter.JwtAuthFilter;
-import com.server.auth.token.util.filter.JwtExceptionFilter;
+import com.server.auth.oauth.handler.OAuth2FailureHandler;
+import com.server.auth.oauth.handler.OAuth2SuccessHandler;
+import com.server.auth.oauth.service.OAuth2UserService;
+import com.server.auth.common.filter.JwtAuthFilter;
+import com.server.auth.common.exception.JwtFilterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,15 +15,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-//@EnableWebSecurity(debug = true)
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final MyAuthenticationSuccessHandler oAuth2LoginSuccessHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2UserService OAuth2UserService;
     private final JwtAuthFilter jwtAuthFilter;
-    private final MyAuthenticationFailureHandler oAuth2LoginFailureHandler;
-    private final JwtExceptionFilter jwtExceptionFilter;
+    private final OAuth2FailureHandler oAuth2LoginFailureHandler;
+    private final JwtFilterException jwtExceptionFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,15 +32,19 @@ public class SecurityConfig {
                 .csrf().disable() // CSRF 보호 기능 비활성화
                 .formLogin().disable() // form 로그인 비활성화
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션관리 정책을 STATELESS(세션이 있으면 쓰지도 않고, 없으면 만들지도 않는다)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests() // 요청에 대한 인증 설정
-                .antMatchers("/**")
-                .permitAll() // 토큰 발급을 위한 경로는 모두 허용
-                .anyRequest().authenticated() // 그 외의 모든 요청은 인증이 필요하다.
+
+                // URL 인증 여부 Part
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers("/token/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
-                .oauth2Login() // OAuth2 로그인 설정시작
-                .userInfoEndpoint().userService(customOAuth2UserService) // OAuth2 로그인시 사용자 정보를 가져오는 엔드포인트와 사용자 서비스를 설정
+
+                // OAuth2 Part
+                .oauth2Login()
+                .userInfoEndpoint().userService(OAuth2UserService) // OAuth2 로그인시 사용자 정보를 가져오는 엔드포인트와 사용자 서비스를 설정
                 .and()
                 .failureHandler(oAuth2LoginFailureHandler) // OAuth2 로그인 실패시 처리할 핸들러를 지정해준다.
                 .successHandler(oAuth2LoginSuccessHandler); // OAuth2 로그인 성공시 처리할 핸들러를 지정해준다.

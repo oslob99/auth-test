@@ -1,11 +1,11 @@
-package com.server.auth.token.controller;
+package com.server.auth.oauth.controller;
 
-import com.server.auth.token.refresh.domain.RefreshToken;
-import com.server.auth.token.refresh.repository.RefreshTokenRepository;
-import com.server.auth.token.refresh.service.RefreshTokenService;
+import com.server.auth.oauth.refresh.domain.RefreshToken;
+import com.server.auth.oauth.refresh.repository.RefreshTokenRepository;
+import com.server.auth.oauth.refresh.service.RefreshTokenService;
 import com.server.auth.user.dto.response.StatusResponseDto;
 import com.server.auth.user.dto.response.TokenResponseStatus;
-import com.server.auth.token.util.JwtUtil;
+import com.server.auth.common.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

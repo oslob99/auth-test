@@ -1,6 +1,6 @@
-package com.server.auth.token.refresh.repository;
+package com.server.auth.oauth.refresh.repository;
 
-import com.server.auth.token.refresh.domain.RefreshToken;
+import com.server.auth.oauth.refresh.domain.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

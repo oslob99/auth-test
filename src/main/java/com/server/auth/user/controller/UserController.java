@@ -1,7 +1,6 @@
-package com.server.auth.user;
+package com.server.auth.user.controller;
 
-import com.server.auth.oauth.security.dto.SecurityUserDto;
-import lombok.Data;
+import com.server.auth.oauth.dto.UserInfoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ public class UserController {
 
     @GetMapping("/code")
     private ResponseEntity<?> welcome(
-            String accessToken
+            @RequestParam String accessToken
     ){
 
         log.info("AccessToken : {}", accessToken);
@@ -26,7 +25,7 @@ public class UserController {
 
     @GetMapping("/auth")
     private ResponseEntity<?> auth(
-            @AuthenticationPrincipal SecurityUserDto dto
+            @AuthenticationPrincipal UserInfoDto dto
             ){
 
         log.info("dto : {]", dto);

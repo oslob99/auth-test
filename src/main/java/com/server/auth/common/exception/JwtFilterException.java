@@ -1,8 +1,7 @@
-package com.server.auth.token.util.filter;
+package com.server.auth.common.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.auth.user.dto.response.StatusResponseDto;
-import com.server.auth.common.exception.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtExceptionFilter extends OncePerRequestFilter {
+public class JwtFilterException extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper;
 
